@@ -38,7 +38,7 @@
       };
     },
     created(){
-      axios.get("https://raw.githubusercontent.com/hexschool/w3hexschool-API/master/data.json")
+      this.$http.get("https://raw.githubusercontent.com/hexschool/w3hexschool-API/master/data.json")
         .then(res => {
           this.tableData = res.data
       })
