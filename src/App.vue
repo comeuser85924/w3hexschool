@@ -6,7 +6,6 @@
       <h1>w3HexSchool 鼠年全馬鐵人挑戰 - 查詢系統</h1>
       <v-client-table ref="myTable" :data="tableData" :columns="columns" :options="options">
         <template   slot="名字" slot-scope="props">
-          {{props}}
           <a  class="text-left textover"  :href="props.row.blogUrl">{{ props.row.name }}</a>
         </template>
         <template   slot="部落格文章" slot-scope="props">
@@ -22,7 +21,6 @@
   </template>
 
   <script>
-  import axios from 'axios';
   export default {
     name: 'App',
     data() {
