@@ -1,22 +1,38 @@
   <template>
-    <div id="app" class="container">
+    <div id="app" class="container f-16" >
       <!-- log圖片 -->
       <img src="./assets/logo.png">
       <!-- 我們的標題 -->
       <h1>w3HexSchool 鼠年全馬鐵人挑戰 - 查詢系統</h1>
-      <v-client-table ref="myTable" :data="tableData" :columns="columns" :options="options">
-        <template   slot="名字" slot-scope="props">
-          <a  class="text-left textover"  :href="props.row.blogUrl">{{ props.row.name }}</a>
-        </template>
-        <template   slot="部落格文章" slot-scope="props">
-          <!-- <button @click="openModal(props.row.blogList)">詳細</button>    -->
-          <a v-for="(item,i) in props.row.blogList" :key="i" :href="item.url">{{ item.title }}<br></a>
-        </template>
-        <template   slot="更新時間" slot-scope="props">
-          {{ props.row.updateTime }}
-        </template>
-      </v-client-table>
-
+      
+      
+      <div class="d-flex w-100 p-3">
+        <select class="form-control w-50 mr-3" v-model="selectType" >
+          <!-- <option value="blogArtice" disabled selected>--請選擇--</option> -->
+          <option value="name">名字</option>
+          <option value="blogArtice">部落格文章</option>
+        </select>
+        <input class="w-50 form-control" v-model="searchWords" >
+      </div>
+      <span >符合筆數:{{conformCount}}</span>
+      
+      <table class="table table-striped">
+        <thead >
+          <tr>
+            <th v-for="(item,i) in columns"  :key=i>
+              <a>{{item}}</a>
+            </th>
+          </tr>
+        </thead>
+        
+        <tbody>
+          <tr v-for="(item,i) in filterSearch"  :key=i>
+            <td><a :href="item.blogUrl">{{item.name}}</a></td>
+            <td ><a v-for="(items,k) in item.blogList"  :key=k :href="items.url">{{items.title}}<br></a></td>
+            <td>{{item.updateTime}}</td>
+          </tr>
+        </tbody>
+      </table>  
     </div>
   </template>
 
@@ -27,21 +43,55 @@
       return {
         columns: [ "名字", "部落格文章","更新時間"],
         tableData: [],
-        options: {
-          headings: {
-                  blogUrl: "名字",
-                  blogList: "部落格文章",
-                  updateTime: "更新時間"
-              }
-  
-        }
+        searchWords:null,
+        selectType:'blogArtice',
+        conformCount:0,
       };
     },
-    created(){
+    computed: {
+      filterSearch() {
+        //判斷輸入框是否為空
+        if(this.searchWords){
+          this.conformCount = 0
+           if(this.selectType === 'name'){
+              //過濾
+              return this.tableData.filter((item)=>{
+                //名字
+                 if(item.name && item.name.match(this.searchWords)) {
+                   this.conformCount = this.conformCount +1
+                   return true
+                 }  
+              })
+           }else if(this.selectType === 'blogArtice'){
+              //過濾
+              return this.tableData.filter((item)=>{
+                //文章標題
+                //find回傳單一true
+                return item.blogList.find((items)=>{
+                  //如果標題有符合輸入值就回傳true
+                  if(items.title.match(this.searchWords)){
+                    this.conformCount = this.conformCount +1
+                    
+                    return true
+                  }
+                })
+              })
+           }
+         }else{
+           this.conformCount = 0
+           return this.tableData
+         }
+        
+        // return this.tableData.filter(searchResult => searchResult.match(this.searchWords));
+        // return this.tableData.filter(searchResult => searchResult.title.match(this.searchWords));
+      }
+    },
+    beforeMount(){
       this.$http.get("https://raw.githubusercontent.com/hexschool/w3hexschool-API/master/data.json")
         .then(res => {
-          this.tableData = res.data
-      })
+          this.tableData = res.data 
+        })
+      
     },
   }
   </script>
@@ -62,5 +112,11 @@ table {
 .col-md-12{
   display: flex;
   justify-content: space-between;
+}
+.f-16{
+  font-size:16px;
+  @media screen and (max-width: 786px){
+    font-size:14px;
+  }
 }
 </style>
