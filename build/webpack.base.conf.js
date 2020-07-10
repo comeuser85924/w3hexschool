@@ -75,8 +75,8 @@ module.exports = {
             loader: 'sass-loader'
           }
         ]
-
-      }
+      },
+      
     ]
   },
   plugins: [
