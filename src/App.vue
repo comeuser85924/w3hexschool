@@ -145,9 +145,14 @@
                 })
               })
            }
-        }else{
+        }
+        else if(this.sortCurrent =='manySort'){
           this.conformCount = 0
-          return this.tableData
+          return  this.handleFilter('manySort')
+        }
+        else{
+          this.conformCount = 0
+          return  this.handleFilter('newSort')
         }
        
         // return this.tableData.filter(searchResult => searchResult.match(this.searchWords));
@@ -171,14 +176,16 @@
         return true
       },
       handleFilter(item){
-        this.sortCurrent = item
-        if( this.sortCurrent == 'newSort'){
+        
+        if( item == 'newSort'){
+          this.sortCurrent = item
           var reg =/[\u4e00-\u9fa5]/g;
-          this.tableData.sort(function (a, b) {
+          return this.tableData.sort(function (a, b) {
             return  new Date(b.updateTime.replace(reg,'')) - new Date(a.updateTime.replace(reg,'')) 
           }); 
-        }else if(this.sortCurrent == 'manySort'){
-          this.tableData.sort(function (a, b) {
+        }else if(item == 'manySort'){
+          this.sortCurrent = item
+          return this.tableData.sort(function (a, b) {
             return b.blogList.length - a.blogList.length 
           }); 
         }
