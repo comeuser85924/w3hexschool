@@ -16,6 +16,10 @@
         <span class="text-2xl">符合筆數:{{conformCount}}</span>
         
       </div>
+      <div class="max-w-screen-xl mx-auto  flex" style="border-bottom: 1px solid #ededed;">
+        <span class="m-2 font-bold text-2xl">選擇排序</span>
+        <button v-for="(item,i) in filterList" :key="i" class="m-2" :class="{'active':sortCurrent == item.id}" @click="handleFilter(item.id)">{{item.name}}</button>
+      </div>
       <div class="max-w-screen-xl mx-auto mt-4" > 
         <p v-if="loading">載入中...請稍等</p>
         <div class=" flex w-full flex-wrap justify-center m-auto ">
@@ -101,6 +105,15 @@
 
         open: false,
         alertList:[],
+        //篩選功能
+        filterList:[
+          {id:"newSort",name:'最新文章'},
+          {id:"manySort",name:'文章多到寡'}
+        ],
+        sortCurrent:'newSort',
+        //分頁功能
+        currentPage:0,
+        totalPage:0,
       };
     },
     computed: {
@@ -132,11 +145,11 @@
                 })
               })
            }
-         }else{
-           this.conformCount = 0
-           return this.tableData
-         }
-        
+        }else{
+          this.conformCount = 0
+          return this.tableData
+        }
+       
         // return this.tableData.filter(searchResult => searchResult.match(this.searchWords));
         // return this.tableData.filter(searchResult => searchResult.title.match(this.searchWords));
       }
@@ -154,9 +167,21 @@
         this.open = false;
       },
       handlerAlert(i){
-        
         this.alertList = this.filterSearch[i].blogList
         return true
+      },
+      handleFilter(item){
+        this.sortCurrent = item
+        if( this.sortCurrent == 'newSort'){
+          var reg =/[\u4e00-\u9fa5]/g;
+          this.tableData.sort(function (a, b) {
+            return  new Date(b.updateTime.replace(reg,'')) - new Date(a.updateTime.replace(reg,'')) 
+          }); 
+        }else if(this.sortCurrent == 'manySort'){
+          this.tableData.sort(function (a, b) {
+            return b.blogList.length - a.blogList.length 
+          }); 
+        }
       }
     },
   }
@@ -190,4 +215,7 @@ table {
 .blur{
   -webkit-filter:blur(6px);
   }
+.active{
+  color:#FF5E45;
+}
 </style>
